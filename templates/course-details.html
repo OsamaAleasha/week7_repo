@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details | EduPlatform</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='courses.css') }}"> -->
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/courses.css">
+</head>
+<body>
+
+<header class="topbar">
+        <h2>EduPlatform</h2>
+        <nav>
+            <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
+            <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
+            <a href="{{ url_for('profile_page') }}">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </nav>
+    </header>
+
+<main class="app-container">
+    <div style="width: 100%; max-width: 1100px;">
+        <div class="course-hero-img"></div>
+        
+        <div class="profile-grid">
+            <section>
+                <div class="card">
+                    <h1 style="font-size: 32px; margin-bottom: 16px;"></h1>
+                    <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 24px;">
+                        
+                    </p>
+
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">Skills Requirements.</h3>
+                    <div class="skills-container" style="margin-bottom: 25px;">
+                        <span class="skill-tag">Neural Networks</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">TensorFlow</span>
+                        <span class="skill-tag">Data Ethics</span>
+                    </div>
+
+                    <div class="instructor-card">
+                        <div class="instructor-avatar"></div>
+                        <div>
+                            <p style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Instructor</p>
+                            <p style="font-weight: 600;"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside>
+                <div class="card" style="position: sticky; top: 100px;">
+                    <h2 style="font-size: 20px; margin-bottom: 10px;">Enrollment</h2>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Get lifetime access to video lectures and community forums.</p>
+                    
+                    <div style="margin-bottom: 20px; font-size: 14px;">
+                        <p>✅ 45 hours of video</p>
+                        <p>✅ Certificate of completion</p>
+                        <p>✅ 12 Downloadable resources</p>
+                    </div>
+
+                    <button style="background: var(--accent);">ENROLL NOW</button>
+                    <button style="background: transparent; border: 1px solid var(--border); color: var(--text-main);">SAVE TO WISHLIST</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+</main>
+
+    <script src="{{ url_for('static', filename='js/course-details.js') }}"></script>
+
+</body>
+</html>

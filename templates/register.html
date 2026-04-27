@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | EduPlatform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <!-- <link rel="stylesheet" href="/static/auth.css"> -->
+</head>
+
+<body>
+    <main style="padding: 40px 0;">
+        <div class="login-container" style="max-width: 500px;">
+            <h1>REGISTER</h1>
+            <form onsubmit="registerUser(event)">
+                <div class="input-group">
+                    <label for="username">USERNAME</label>
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">EMAIL</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">PASSWORD</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="input-group">
+                        <label for="phone">PHONE</label>
+                        <input type="text" id="phone" name="phone" placeholder="Phone">
+                    </div>
+                    <div class="input-group">
+                        <label for="age">AGE</label>
+                        <input type="number" id="age" name="age" placeholder="Age">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="major">MAJOR</label>
+                    <input type="text" id="major" name="major" placeholder="Course of Study">
+                </div>
+
+                <div class="input-group">
+                    <label>SELECT YOUR SKILLS</label>
+                    <div class="skills-container" id="skillsContainer">
+                    </div>
+                </div>
+
+                <button type="submit">CREATE ACCOUNT</button>
+                <div class="footer">
+                    Already have an account? <a href="{{ url_for('login_page') }}">Login</a>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+
+</html>

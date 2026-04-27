@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | EduPlatform</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+        <h2>EduPlatform</h2>
+        <nav>
+            <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
+            <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
+            <a href="{{ url_for('profile_page') }}">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </nav>
+</header>
+
+    <main class="app-container">
+        <div class="profile-grid">
+            <aside class="card user-info-card">
+
+                <div class="avatar-placeholder" id="avatar">JD</div>
+
+                <h1 id="username">John Doe</h1>
+
+                <p id="major" style="color: var(--text-muted);">
+                    Computer Science Major
+                </p>
+                
+                <div style="text-align: left; margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <p id="email"></p>
+                    <p id="phone"></p>
+                <button class="btn-primary" style="margin-top: 20px; background: var(--primary);">Edit Profile</button>
+            </aside>
+
+            <section>
+                <div class="stat-group">
+                    <div class="stat-card"><h3>Enrolled</h3><div class="value">12</div></div>
+                    <div class="stat-card"><h3>Completed</h3><div class="value">4</div></div>
+                    <div class="stat-card"><h3>Rank</h3><div class="value">Top 5%</div></div>
+                </div>
+
+                <div class="card">
+                    <h2 style="font-size: 18px; margin-bottom: 15px;">Skills & Expertise</h2>
+                    <div id="skillsContainer">
+                </div>
+    </div>
+        </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

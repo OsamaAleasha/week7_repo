@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Courses | EduPlatform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='courses.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h2>EduPlatform</h2>
+        <nav>
+            <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
+            <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
+            <a href="{{ url_for('profile_page') }}">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </nav>
+    </header>
+
+    <main class="app-container">
+        <section class="filters-section">
+            <input type="text" placeholder="Search Courses..." class="search-bar">
+        
+            <select id="skill-filter">
+                <option value="All Skills">All Skills</option>
+                <option value="Programming">Programming</option>
+                <option value="Design">Design</option>
+                <option value="Data Science">Data Science</option>
+            </select>
+        
+            <select id="sort-filter">
+                <option value="relevance">Newest</option>
+                <option value="title">A-Z Title</option>
+            </select>
+        </section>
+
+        <section class="courses-grid">
+            
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/courses.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

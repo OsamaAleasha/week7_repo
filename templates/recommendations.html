@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Recommendations | EduPlatform</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='courses.css') }}"> -->
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/courses.css">
+</head>
+<body>
+
+<header class="topbar">
+        <h2>EduPlatform</h2>
+        <nav>
+            <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
+            <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
+            <a href="{{ url_for('profile_page') }}">Profile</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </nav>
+    </header>
+
+<main class="app-container">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 32px;">Recommended For You</h1>
+        <p style="color: var(--text-muted);">Based on your interests in <strong>Data Science</strong> and <strong>UI Design</strong>.</p>
+    </div>
+
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <article class="card horizontal-card">
+            <div class="course-preview-box"></div>
+            <div style="flex-grow: 1;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span class="match-badge">98% Match</span>
+                    <span style="color: #FFD700;">★★★★★</span>
+                </div>
+                <h3 style="font-size: 20px; margin-bottom: 8px;">Full-Stack Web Development</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Perfect next step for your programming journey. Learn React, Node.js, and MongoDB.</p>
+                
+                <div style="width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;">
+                    <div style="width: 90%; height: 100%; background: var(--accent);"></div>
+                </div>
+                <p style="font-size: 11px; margin-top: 5px; color: var(--text-muted); text-transform: uppercase;">Course Demand: High</p>
+            </div>
+            <button style="width: auto; padding: 10px 20px; font-size: 14px;">VIEW</button>
+        </article>
+
+        <article class="card horizontal-card">
+            <div class="course-preview-box"></div>
+            <div style="flex-grow: 1;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span class="match-badge">85% Match</span>
+                    <span style="color: #FFD700;">★★★★☆</span>
+                </div>
+                <h3 style="font-size: 20px; margin-bottom: 8px;">Business Analytics with Excel</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Leverage your major skills to analyze complex business data sets efficiently.</p>
+                
+                <div style="width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;">
+                    <div style="width: 40%; height: 100%; background: var(--accent);"></div>
+                </div>
+                <p style="font-size: 11px; margin-top: 5px; color: var(--text-muted); text-transform: uppercase;">Course Demand: Medium</p>
+            </div>
+            <button style="width: auto; padding: 10px 20px; font-size: 14px;">VIEW</button>
+        </article>
+
+    </div>
+</main>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
