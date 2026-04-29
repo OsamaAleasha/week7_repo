@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Recommendations | EduPlatform</title>
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='courses.css') }}"> -->
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/courses.css">
+
+    <script>
+        if (!localStorage.getItem("access_token")) {
+            window.location.href = "/login";
+        }
+    </script>
 </head>
 <body>
 
@@ -67,6 +71,7 @@
 
     </div>
 </main>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/Recommendations.js') }}"></script>
 </body>
 </html>

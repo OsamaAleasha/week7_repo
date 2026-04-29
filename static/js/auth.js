@@ -45,7 +45,8 @@ async function registerUser(event) {
         return;
     }
 
-    localStorage.setItem("token", data.token);
+    localStorage.setItem("access_token", data.token); // Your backend returns 'token' currently
+    localStorage.setItem("refresh_token", data.refresh_token || ""); // Save refresh if provided
     window.location.href = "/courses_page";
 }
 
@@ -72,7 +73,8 @@ async function loginUser(event) {
         return;
     }
 
-    localStorage.setItem("token", data.token);
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
     window.location.href = "/courses_page";
 }
 

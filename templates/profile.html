@@ -6,6 +6,13 @@
     <title>My Profile | EduPlatform</title>
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
     <link rel="stylesheet" href="/static/style.css">
+
+    <script>
+        if (!localStorage.getItem("access_token")) {
+            window.location.href = "/login";
+        }
+    </script>
+    
 </head>
 <body>
 <header class="topbar">
@@ -14,7 +21,7 @@
             <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
             <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
             <a href="{{ url_for('profile_page') }}">Profile</a>
-            <a href="#" onclick="logout()">Logout</a>
+            <a href="#" onclick="logoutUser()">Logout</a>
         </nav>
 </header>
 
@@ -52,8 +59,9 @@
             </section>
         </div>
     </main>
-
+    
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
 </html>

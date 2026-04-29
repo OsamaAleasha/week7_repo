@@ -17,7 +17,7 @@
             <a href="{{ url_for('courses_page') }}" class="active">Courses</a>
             <a href="{{ url_for('recommendations_page') }}">Recommendations</a>
             <a href="{{ url_for('profile_page') }}">Profile</a>
-            <a href="#" onclick="logout()">Logout</a>
+            <a href="#" onclick="logoutUser()">Logout</a>
         </nav>
     </header>
 
@@ -70,6 +70,7 @@
     </div>
 </main>
 
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/course-details.js') }}"></script>
 
 </body>

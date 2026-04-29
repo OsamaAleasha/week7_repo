@@ -1,15 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from database.main import *
 from dotenv import load_dotenv
-from sqlalchemy import select, asc, desc, or_
-import os
-import bcrypt
-import datetime
+from datetime import datetime, timedelta, timezone
 from jwt import JWT, jwk_from_dict
 from functools import wraps
+import os
+import bcrypt
+import database.main as db
+
 
 load_dotenv()
-
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -21,32 +20,56 @@ key = jwk_from_dict({
     "kty": "oct"
 })
 
-# JWT HELPER FUNCTIONS
-def create_token(user_id):
+# --- JWT HELPERS ---
+
+def create_token(user_id, token_type="access"):
+    now = datetime.now(timezone.utc)
+    
+    # Set expiration based on type
+    if token_type == "access":
+        expiry = now + timedelta(minutes=15)
+    else:
+        expiry = now + timedelta(days=7)
+
     payload = {
         "user_id": user_id,
-        "exp": int((datetime.datetime.utcnow() + datetime.timedelta(days=1)).timestamp())
+        "type": token_type, # This prevents using a refresh token as an access token
+        "exp": int(expiry.timestamp()),
+        "iat": int(now.timestamp())
     }
     return jwt_instance.encode(payload, key, alg="HS256")
 
-def decode_token(token):
-    try:
-        data = jwt_instance.decode(token, key, do_time_check=True)
-        return data["user_id"]
-    except Exception:
-        return None
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        # Check Authorization header
+        auth_header = request.headers.get("Authorization")
+        
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+        
+        if not token:
+            return jsonify({"error": "Token is missing"}), 401
+        
+        try:
+            data = jwt_instance.decode(token, key, do_time_check=True)
 
-def get_current_user():
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return None
-    token = auth_header.split(" ")[1]
-    return decode_token(token)
+            if data.get("type") != "access":
+                return jsonify({"error": "Invalid token type for this route"}), 401
+
+            current_user_id = data["user_id"]
+        except Exception as e:
+            return jsonify({"error": "Invalid or expired token"}), 401
+
+        # Pass the user_id to the route function
+        return f(current_user_id, *args, **kwargs)
+    
+    return decorated
 
 
+# --- PAGE ROUTES ---
 
-
-# PAGE ROUTES (Serve HTML)
 @app.route("/")
 def home():
     return redirect("/login")
@@ -76,98 +99,85 @@ def profile_page():
     return render_template("profile.html")
 
 
+# --- API ROUTES ---
 
+@app.route("/api/auth/refresh", methods=["POST"])
+def refresh():
+    data = request.get_json()
+    refresh_token = data.get("refresh_token")
+    
+    if not refresh_token:
+        return jsonify({"error": "No refresh token provided"}), 400
 
-# API ROUTES (Handle Data & Auth)
+    try:
+        # 1. Decode and verify signature/expiration
+        decoded = jwt_instance.decode(refresh_token, key, do_time_check=True)
+        
+        # 2. Critical Safety Check: Ensure this is actually a REFRESH token
+        if decoded.get("type") != "refresh":
+            return jsonify({"error": "Invalid token type"}), 401
+            
+        # 3. If valid, issue a NEW Access Token
+        user_id = decoded["user_id"]
+        new_access_token = create_token(user_id, token_type="access")
+        
+        return jsonify({
+            "access_token": new_access_token
+        })
+
+    except Exception:
+        return jsonify({"error": "Refresh token expired or invalid. Please login again."}), 401
+
 @app.route("/api/auth/login", methods=["POST"])
 def api_login():
     data = request.get_json()
-
     email = data.get("email")
     password = data.get("password")
 
-    with engine.begin() as conn:
-        user = get_user_by_email(conn, email)
+    user = db.get_user_by_email(email)
 
     if not user:
         return jsonify({"error": "User not found"}), 401
 
-    if not bcrypt.checkpw(password.encode(), user.password.encode()):
+    if not bcrypt.checkpw(password.encode(), user['password'].encode()):
         return jsonify({"error": "Invalid password"}), 401
 
-    token = create_token(user.id)
-
     return jsonify({
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email
-        },
-        "token": token
+        "user": {"id": user['id'], "username": user['username'], "email": user['email']},
+        "access_token": create_token(user['id'], "access"),
+        "refresh_token": create_token(user['id'], "refresh")
     })
 
 @app.route("/api/auth/register", methods=["POST"])
 def api_register():
     data = request.get_json()
 
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
-    phone = data.get("phone")
-    age = data.get("age")
-    major = data.get("major")
-    # Change 1: Ensure we use this name consistently
-    skills_input = data.get("skills", []) 
-
-    hashed_password = bcrypt.hashpw(
-        password.encode(),
-        bcrypt.gensalt()
-    ).decode()
-
     try:
-        with engine.begin() as conn:
-            user_id = create_user(
-                conn,
-                username,
-                email,
-                hashed_password,
-                phone,
-                age,
-                major
-            )
+        hashed_password = bcrypt.hashpw(data.get("password").encode(), bcrypt.gensalt()).decode()
 
-            # Change 2: Loop over 'skills_input' instead of 'skills'
-            skills_formatted = [
-                {
-                    "id": int(s["id"]), 
-                    "level": s["level"]
-                }
-                for s in skills_input 
-            ]
+        user_id = db.register_user_transaction(
+            data.get("username"), data.get("email"), hashed_password,
+            data.get("phone"), data.get("age"), data.get("major"),
+            data.get("skills", [])
+        )
 
-            # Change 3: Move this inside the 'with' block so 'conn' is still active
-            add_user_skills(conn, user_id, skills_formatted)
+        token = create_token(user_id)
 
-    except IntegrityError:
-        return jsonify({"error": "Username or email already exists"}), 409
+        return jsonify({
+        "user": {"id": user_id, "username": data.get("username"), "email": data.get("email")},
+        "access_token": create_token(user_id, "access"),
+        "refresh_token": create_token(user_id, "refresh")
+        }), 201
+    
     except Exception as e:
-        # This will now catch the specific error if add_user_skills fails
-        return jsonify({"error": str(e)}), 500
-
-    token = create_token(user_id)
-    return jsonify({
-        "user": {"id": user_id, "username": username, "email": email},
-        "token": token
-    })
+        error_msg = str(e).lower()
+        if "unique" in error_msg or "already exists" in error_msg:
+            return jsonify({"error": "Email or Username already registered"}), 409
+        return jsonify({"error": "Registration failed"}), 400
 
 @app.route("/api/skills", methods=["GET"])
 def get_skills():
-    with engine.begin() as conn:
-        result = conn.execute(select(skills)).mappings().all()
-
-        return jsonify({
-            "skills": [dict(row) for row in result]
-        })
+    return jsonify({"skills": db.get_all_skills()})
 
 @app.route("/api/courses", methods=["GET"])
 def get_courses():
@@ -180,87 +190,56 @@ def get_courses():
 
     offset = (page - 1) * limit
 
-    with engine.begin() as conn:
-        query = select(courses)
+    course_list = db.get_filtered_courses(q, skill, instructor, sort, limit, offset)
 
-        # Search by keyword (Title or Description)
-        if q:
-            query = query.where(
-                or_(
-                    courses.c.title.ilike(f"%{q}%"),
-                    courses.c.description.ilike(f"%{q}%")
-                )
-            )
-
-        # NEW: Filter by skill (checks the skill_requirements column)
-        if skill and skill != "All Skills":
-            query = query.where(
-                courses.c.skill_requirements.ilike(f"%{skill}%")
-            )
-
-        # Filter by instructor
-        if instructor:
-            query = query.where(
-                courses.c.instructor.ilike(f"%{instructor}%")
-            )
-
-        # Sorting
-        if sort == "title":
-            query = query.order_by(asc(courses.c.title))
-        else:
-            query = query.order_by(desc(courses.c.id))  # default "relevance-like"
-
-        # Pagination
-        query = query.limit(limit).offset(offset)
-
-        result = conn.execute(query).mappings().all()
-
-        return jsonify({
+    return jsonify({
         "page": page,
         "limit": limit,
-        "courses": [dict(row) for row in result]
+        "courses": course_list
     })
 
 @app.route("/api/courses/<int:course_id>", methods=["GET"])
 def get_course(course_id):
-    with engine.begin() as conn:
-        query = select(courses).where(courses.c.id == course_id)
+    course = db.get_course_by_id(course_id)
 
-        result = conn.execute(query).mappings().first()
+    if not course:
+        return jsonify({"error": "Course not found"}), 404
 
-        if not result:
-            return jsonify({"error": "Course not found"}), 404
+    return jsonify({"course": course})
 
-        return jsonify({
-            "course": dict(result)
-        })
-    
 @app.route("/api/users/me", methods=["GET"])
-def get_my_profile():
-    user_id = get_current_user()
+@token_required
+def get_my_profile(user_id):
+    user_data, user_skills = db.get_user_profile_data(user_id)
 
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
+    if not user_data:
+        return jsonify({"error": "User not found"}), 404
 
-    with engine.begin() as conn:
+    # Protect the hashed password
+    user_data.pop("password", None)
 
-        # Get user
-        user_query = select(users).where(users.c.id == user_id)
-        user = conn.execute(user_query).mappings().first()
+    return jsonify({"user": user_data,"skills": user_skills})
 
-        if not user:
-            return jsonify({"error": "User not found"}), 404
+@app.route("/api/recommend", methods=["POST"])
+@token_required
+def api_recommend(user_id):
+    try:
+        user_data, user_skills = db.get_user_profile_data(user_id)
+        
+        if not user_skills:
+            return jsonify({
+                "message": "No skills found in your profile. Add skills to get better recommendations.",
+                "recommendations": []
+            }), 200
 
-        # Get user skills (JOIN table)
-        skills_query = (
-            select(skills.c.id, skills.c.name, user_skills.c.proficiency_level)
-            .select_from(user_skills.join(skills))
-            .where(user_skills.c.user_id == user_id)
-        )
-
-        skills_result = conn.execute(skills_query).mappings().all()
+        recommendations = db.get_course_recommendations(user_id, user_skills)
 
         return jsonify({
-            "user": dict(user),
-            "skills": [dict(s) for s in skills_result]
+            "status": "success",
+            "user_major": user_data.get("major"),
+            "recommendations": recommendations
         })
+
+    except Exception as e:
+        print(f"Recommendation Error: {str(e)}")
+        return jsonify({"error": "Failed to generate recommendations"}), 500

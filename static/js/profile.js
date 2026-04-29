@@ -1,20 +1,15 @@
 async function loadProfile() {
-    const token = localStorage.getItem("token");
+    // 1. Use apiFetch
+    const response = await apiFetch("/api/users/me");
 
-    const response = await fetch("/api/users/me", {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
+    // 2. Handle errors (apiFetch only redirects on total failure)
+    if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Profile Error:", errorData.error);
+            return;
         }
-    });
 
     const data = await response.json();
-
-    if (!response.ok) {
-        console.error(data.error);
-        return;
-    }
-
     const { user, skills } = data;
 
     // --- Populate User Info ---
