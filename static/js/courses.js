@@ -45,19 +45,78 @@ async function loadCourses() {
 
 function renderCourses(courses) {
     const grid = document.querySelector(".courses-grid");
-    if (courses.length === 0) {
-        grid.innerHTML = "<p>No courses found matching your criteria.</p>";
+    
+    if (!courses || courses.length === 0) {
+        grid.innerHTML = "<p style='text-align:center; grid-column: 1/-1; padding: 40px;'>No courses found matching your criteria.</p>";
         return;
     }
 
-    let html = ""
+    let html = "";
     courses.forEach(course => {
+        const icon = getCourseEmoji(course.title + " " + (course.description || ""));
+        
         html += `
-            <article class="card">
-                <div style="height: 140px; background: #eee; border-radius: 10px; margin-bottom: 15px;"></div>
-                <h1>${course.title}</h1>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">${course.description || "No description available"}</p>
-                <button onclick="location.href='/course-details_page?id=${course.id}'">View Details</button>
+            <article class="card" style="
+                display: flex; 
+                flex-direction: column; 
+                padding: 0; 
+                overflow: hidden; 
+                height: 100%; /* Ensures all cards in a row are equal height */
+            ">
+                <!-- 1. Top Image/Emoji Box -->
+                <div class="course-preview-box" style="
+                    height: 150px; 
+                    width: 100%;
+                    background: #f3f4f6; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    border-bottom: 1px solid var(--border);
+                ">
+                    <span style="font-size: 50px; opacity: 0.5;">${icon}</span>
+                </div>
+
+                <!-- 2. Content Area -->
+                <div style="
+                    padding: 20px; 
+                    display: flex; 
+                    flex-direction: column; 
+                    flex-grow: 1; /* Pushes the button to the bottom */
+                ">
+                    <h1 style="
+                        font-size: 18px; 
+                        margin: 0 0 10px 0; 
+                        color: var(--text-main);
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        height: 44px; /* Fixes title height for alignment */
+                    ">
+                        ${course.title}
+                    </h1>
+                    
+                    <p style="
+                        color: var(--text-muted); 
+                        font-size: 14px; 
+                        margin-bottom: 20px;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        flex-grow: 1; /* Takes up available space */
+                    ">
+                        ${course.description || "No description available"}
+                    </p>
+
+                    <!-- 3. Button: Anchored at the bottom -->
+                    <button 
+                        onclick="location.href='/course-details_page?id=${course.id}'"
+                        style="width: 100%; margin-top: auto;"
+                    >
+                        View Details
+                    </button>
+                </div>
             </article>
         `;
     });

@@ -89,12 +89,3 @@
 .enrollment-sidebar { position: sticky; top: 100px; }
 .enrollment-features { margin-bottom: 20px; font-size: 14px; }
 .enrollment-features p { margin: 5px 0; }
-
-/* Recommendation Specifics */
-.star-rating { color: #FFD700; }
-.demand-text { 
-    font-size: 11px; 
-    margin-top: 5px; 
-    color: var(--text-muted); 
-    text-transform: uppercase; 
-}

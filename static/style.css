@@ -106,3 +106,96 @@ nav a.active, nav a:hover { color: var(--accent); }
     padding-top: 20px; 
 }
 .contact-info p { font-size: 14px; margin-bottom: 8px; }
+
+/* Filters Section Layout */
+.filters-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 40px;
+    align-items: center;
+}
+
+/* Styling the Search Bar and Select Dropdowns */
+.search-bar, 
+#skill-filter, 
+#sort-filter {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--secondary);
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    transition: all 0.2s ease;
+    height: 48px; /* Keeps them all the same height */
+    box-sizing: border-box;
+}
+
+/* Make the Search Bar take up more space */
+.search-bar {
+    flex-grow: 1;
+    box-shadow: var(--shadow-md);
+}
+
+/* Hover and Focus States */
+.search-bar:focus, 
+#skill-filter:focus, 
+#sort-filter:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 94, 91, 0.1);
+}
+
+/* Styling Select specifically (adding custom arrow feel) */
+select {
+    cursor: pointer;
+    min-width: 150px;
+    appearance: none; /* Removes default OS arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px !important;
+}
+
+/* Target all buttons in the app, or specifically ones in cards */
+button {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(255, 94, 91, 0.2);
+}
+
+/* Hover effect: make it slightly darker or lift it */
+button:hover {
+    background-color: #ff4a47; /* A slightly deeper red */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 94, 91, 0.3);
+}
+
+/* Active effect: when clicked */
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(255, 94, 91, 0.2);
+}
+
+/* Style for buttons that shouldn't be the main red color (Optional) */
+button.secondary {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+button.secondary:hover {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+}

@@ -47,3 +47,30 @@ function logoutUser() {
     localStorage.clear();
     window.location.href = "/login";
 }
+
+function getCourseEmoji(text) {
+    const content = text.toLowerCase();
+    
+    // Map keywords to emojis
+    const emojiMap = {
+        'python': '🐍',
+        'javascript': '🟨',
+        'data analysis': '📈',
+        'machine learning': '🤖',
+        'sql': '🗄️',
+        'react': '⚛️',
+        'flask': '🧪',
+        'html/css': '🎨',
+        'git': '🌿',
+        'data visualization': '📊',
+    };
+
+    // Find the first match in the title or description
+    for (const [key, emoji] of Object.entries(emojiMap)) {
+        if (content.includes(key)) {
+            return emoji;
+        }
+    }
+
+    return '📚'; // Default if no match
+}

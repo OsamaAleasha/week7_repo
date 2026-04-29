@@ -112,3 +112,41 @@ def get_filtered_courses(q=None, skill=None, instructor=None, sort="relevance", 
 
         result = conn.execute(query.limit(limit).offset(offset)).mappings().all()
         return [dict(row) for row in result]
+    
+
+# AI Functions
+
+import json
+from ai_service import AIService
+ai = AIService()
+
+def get_course_recommendations(user_id, user_skills):
+    # 1. Convert user skills to a vector
+    user_vector = ai.generate_user_vector(user_skills)
+    
+    with engine.begin() as conn:
+        # 2. Get all courses and their vectors
+        # Note: We join with courses table to get titles/descriptions
+        query = select(courses, course_vectors.c.embedding_vector).join(
+            course_vectors, courses.c.id == course_vectors.c.course_id
+        )
+        results = conn.execute(query).mappings().all()
+        
+        scored_courses = []
+        for row in results:
+            # Parse the stored JSON vector back into a list
+            course_vector = json.loads(row['embedding_vector'])
+            
+            # 3. Calculate similarity score (0.0 to 1.0)
+            score = ai.calculate_similarity(user_vector, course_vector)
+            
+            # Format the course data
+            course_data = dict(row)
+            course_data.pop('embedding_vector') # Don't send the long list of numbers to frontend
+            course_data['match_score'] = round(score * 100) # Convert to percentage (e.g. 95)
+            
+            scored_courses.append(course_data)
+        
+        # 4. Sort by highest score and take top 5
+        scored_courses.sort(key=lambda x: x['match_score'], reverse=True)
+        return scored_courses[:5]

@@ -27,6 +27,17 @@ async function loadCourse() {
 }
 
 function renderCourse(course) {
+    const icon = getCourseEmoji(course.title + " " + course.description);
+    
+    const heroImg = document.querySelector(".course-hero-img");
+    if (heroImg) {
+        heroImg.innerHTML = `<span style="font-size: 100px;">${icon}</span>`;
+        heroImg.style.display = "flex";
+        heroImg.style.alignItems = "center";
+        heroImg.style.justifyContent = "center";
+        heroImg.style.background = "#f3f4f6";
+    }
+
     document.querySelector("h1").textContent = course.title;
     document.querySelector("p").textContent = course.description;
 
